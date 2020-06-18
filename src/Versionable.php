@@ -132,6 +132,17 @@ trait Versionable
     }
 
     /**
+     * @return array
+     */
+    public function getVersionableOldAttributes(): array
+    {
+        $changes = $this->getDirty();
+        if (empty($changes)) {
+            return [];
+        }
+        return $this->versionableOldFromArray($this->getOriginal(),$changes);
+    }
+    /**
      * @param array $attributes
      *
      * @return $this
@@ -246,6 +257,30 @@ trait Versionable
     }
 
     /**
+     * Get the versionable attributes of a given array.
+     *
+     * @param array $attributes
+     *
+     * @return array
+     */
+    public function versionableOldFromArray(array $attributes,array $changes): array
+    {
+        $data = [];
+        if (count($this->getVersionable()) > 0) {
+            $data = \array_intersect_key($attributes, array_flip($this->getVersionable()));
+        }
+
+        if (count($this->getDontVersionable()) > 0) {
+            $data = \array_diff_key($attributes, array_flip($this->getDontVersionable()));
+        }
+
+        if ($data) {
+            return \array_intersect_key($data,$changes);
+        }
+        return $attributes;
+    }
+
+    /**
      * @param callable $callback
      */
     public static function withoutVersion(callable $callback)
@@ -266,6 +301,7 @@ trait Versionable
         $data = $this->versions;
         $data->transform(function ($item, $key) {
             $item['contents'] = $this->transformContent($item['contents']);
+            $item['content_old'] = $this->transformContent($item['content_old']);
             return $item;
         });
         return $data;

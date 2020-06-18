@@ -23,6 +23,7 @@ class CreateVersionsTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger(config('versionable.user_foreign_key', 'user_id'));
             $table->morphs('versionable');
+            $table->json('content_old')->nullable();
             $table->json('contents')->nullable();
             $table->timestamps();
         });

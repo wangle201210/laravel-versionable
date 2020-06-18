@@ -27,6 +27,7 @@ class Version extends Model
      */
     protected $casts = [
         'contents' => 'array',
+        'content_old' => 'array',
     ];
 
     /**
@@ -60,6 +61,7 @@ class Version extends Model
         $version->versionable_type = $model->getMorphClass();
         $version->{\config('versionable.user_foreign_key')} = \auth()->id();
         $version->contents = $model->getVersionableAttributes();
+        $version->content_old = $model->getVersionableOldAttributes();
 
         $version->save();
 
